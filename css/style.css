@@ -2246,14 +2246,31 @@ textarea.form-control {
   width: 100%;
 }
 
-.footer-copyright-left {
+.footer-owner-left {
   justify-self: start;
-  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.footer-copyright-text {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12.5px;
 }
 
 .footer-credits-center {
   justify-self: center;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-right-spacer {
+  justify-self: end;
+  width: 100%;
 }
 
 .credits-badge {
@@ -2625,15 +2642,32 @@ textarea.form-control {
     text-align: center;
   }
 
-  .footer-copyright-left,
-  .footer-credits-center,
-  .footer-social-links {
+  .footer-owner-left {
     justify-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .footer-copyright-text {
     text-align: center;
   }
 
   .footer-credits-center {
+    justify-self: center;
+    text-align: center;
     order: -1;
+  }
+
+  .footer-social-links {
+    justify-content: center;
+  }
+
+  .footer-right-spacer {
+    display: none;
   }
 
   .back-to-top-btn {

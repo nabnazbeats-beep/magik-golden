@@ -5,6 +5,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initPreloader();
   initNavbar();
   initHeroSlideshow();
   initCursorGlow();
@@ -31,6 +32,64 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+/* --------------------------------------------------------------------------
+   0. PRELOADER LUXE ÉDITORIAL & ENTRÉE SÉQUENCÉE HERO
+   -------------------------------------------------------------------------- */
+function initPreloader() {
+  const preloader = document.getElementById('site-preloader');
+  const bar = document.getElementById('preloader-bar');
+  const percentEl = document.getElementById('preloader-percent');
+
+  // Prépare les éléments de la Hero section pour leur apparition fluide
+  document.body.classList.add('hero-stagger-ready');
+
+  if (!preloader) {
+    document.body.classList.add('hero-animated');
+    return;
+  }
+
+  let progress = 0;
+  const startTime = performance.now();
+  const targetDuration = 1350; // 1.35s de chargement luxueux
+
+  function triggerReveal() {
+    preloader.classList.add('fade-out');
+    // Déclenche l'apparition séquentielle échelonnée de la Hero Section
+    setTimeout(() => {
+      document.body.classList.add('hero-animated');
+    }, 150);
+
+    setTimeout(() => {
+      preloader.style.display = 'none';
+    }, 850);
+  }
+
+  function update() {
+    const elapsed = performance.now() - startTime;
+    const ratio = Math.min(elapsed / targetDuration, 1);
+    const eased = 1 - Math.pow(1 - ratio, 2.5);
+    progress = Math.min(100, Math.round(eased * 100));
+
+    if (bar) bar.style.width = `${progress}%`;
+    if (percentEl) percentEl.textContent = `${progress}%`;
+
+    if (ratio < 1) {
+      requestAnimationFrame(update);
+    } else {
+      setTimeout(triggerReveal, 180);
+    }
+  }
+
+  requestAnimationFrame(update);
+
+  // Sécurité anti-blocage : forcer la disparition après 2.2s au plus tard
+  setTimeout(() => {
+    if (!preloader.classList.contains('fade-out')) {
+      triggerReveal();
+    }
+  }, 2200);
 }
 
 /* --------------------------------------------------------------------------

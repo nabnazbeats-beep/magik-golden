@@ -99,6 +99,7 @@ function initNavbar() {
   const header = document.querySelector('.site-header');
   const menuToggle = document.querySelector('.menu-toggle');
   const mobileDrawer = document.querySelector('.mobile-drawer');
+  const drawerBackdrop = document.getElementById('drawer-backdrop');
 
   window.addEventListener('scroll', () => {
     if (window.scrollY > 40) {
@@ -109,17 +110,46 @@ function initNavbar() {
   }, { passive: true });
 
   if (menuToggle && mobileDrawer) {
-    menuToggle.addEventListener('click', () => {
-      mobileDrawer.classList.toggle('open');
+    function closeDrawer() {
+      mobileDrawer.classList.remove('open');
+      if (drawerBackdrop) drawerBackdrop.classList.remove('open');
+      menuToggle.classList.remove('active');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    function openDrawer() {
+      mobileDrawer.classList.add('open');
+      if (drawerBackdrop) drawerBackdrop.classList.add('open');
+      menuToggle.classList.add('active');
+      menuToggle.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    menuToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
       const isOpen = mobileDrawer.classList.contains('open');
-      menuToggle.setAttribute('aria-expanded', isOpen);
+      if (isOpen) {
+        closeDrawer();
+      } else {
+        openDrawer();
+      }
     });
 
+    if (drawerBackdrop) {
+      drawerBackdrop.addEventListener('click', closeDrawer);
+    }
+
+    // Fermeture lors du clic sur un lien du menu mobile
     mobileDrawer.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        mobileDrawer.classList.remove('open');
-        menuToggle.setAttribute('aria-expanded', 'false');
-      });
+      link.addEventListener('click', closeDrawer);
+    });
+
+    // Fermeture avec la touche Échap
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileDrawer.classList.contains('open')) {
+        closeDrawer();
+      }
     });
   }
 }
@@ -301,6 +331,7 @@ function initBeforeAfterSlider() {
 
   // Support tactile pour mobile & tablettes
   container.addEventListener('touchstart', (e) => {
+    if (!e.touches || !e.touches[0]) return;
     isDragging = true;
     syncDimensions();
     updateSlider(e.touches[0].clientX);
@@ -310,8 +341,12 @@ function initBeforeAfterSlider() {
     isDragging = false;
   });
 
+  window.addEventListener('touchcancel', () => {
+    isDragging = false;
+  });
+
   window.addEventListener('touchmove', (e) => {
-    if (!isDragging) return;
+    if (!isDragging || !e.touches || !e.touches[0]) return;
     updateSlider(e.touches[0].clientX);
   }, { passive: true });
 }

@@ -56,6 +56,8 @@ html {
   scroll-behavior: smooth;
   color-scheme: dark;
   background-color: var(--bg-primary);
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 body {
@@ -66,7 +68,9 @@ body {
   background-color: var(--bg-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100%;
+  width: 100%;
   position: relative;
 }
 
@@ -502,32 +506,110 @@ h1, h2, h3, h4, h5, h6 {
   top: 80px;
   left: 20px;
   right: 20px;
-  background: rgba(14, 14, 14, 0.96);
+  background: rgba(14, 14, 14, 0.98);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-md);
   padding: 24px;
-  z-index: 999;
+  z-index: 1001;
   flex-direction: column;
-  gap: 18px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+  gap: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95);
+  max-height: calc(100dvh - 100px);
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .mobile-drawer.open {
   display: flex;
+  animation: drawerSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.mobile-drawer a {
-  font-size: 16px;
+@keyframes drawerSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  pointer-events: none;
+}
+
+.drawer-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.menu-toggle {
+  transition: transform 0.25s ease;
+}
+
+.menu-toggle.active {
+  color: #ffffff;
+  transform: rotate(90deg);
+}
+
+.mobile-drawer a:not(.btn) {
+  font-size: 15.5px;
   font-weight: 500;
   color: var(--text-secondary);
-  padding: 8px 0;
+  padding: 9px 0;
   border-bottom: 1px solid var(--border-subtle);
+  transition: color 0.2s ease, padding-left 0.2s ease;
+  text-decoration: none;
+  display: block;
 }
 
-.mobile-drawer a:hover {
+.mobile-drawer a:not(.btn):hover {
   color: var(--text-white);
+  padding-left: 5px;
+}
+
+/* ==========================================================================
+   FIX : BOUTON RÉSERVER DANS LE MENU MOBILE (TEXTE VISIBLE AU SURVOL)
+   ========================================================================== */
+.mobile-drawer .btn-primary {
+  width: 100% !important;
+  color: #050505 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #ffffff !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  border-bottom: none !important;
+  padding: 13px 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: var(--radius-full) !important;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.18) !important;
+  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.mobile-drawer .btn-primary:hover,
+.mobile-drawer .btn-primary:focus,
+.mobile-drawer .btn-primary:active {
+  color: #000000 !important;
+  background-color: #f2f2f2 !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.5) !important;
 }
 
 /* ==========================================================================
@@ -1214,6 +1296,7 @@ body.hero-animated .hero-media-wrapper {
   box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95);
   user-select: none;
   cursor: ew-resize;
+  touch-action: pan-y;
 }
 
 .before-after-wrapper {
@@ -1221,6 +1304,7 @@ body.hero-animated .hero-media-wrapper {
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
+  touch-action: pan-y;
 }
 
 .before-after-wrapper img {
@@ -2486,27 +2570,6 @@ textarea.form-control {
   transform: scale(1.08);
 }
 
-@media (max-width: 768px) {
-  .lightbox-nav-btn {
-    width: 44px;
-    height: 44px;
-  }
-  .lightbox-prev {
-    left: 10px;
-  }
-  .lightbox-next {
-    right: 10px;
-  }
-  .lightbox-close {
-    top: -42px;
-    right: 0;
-    width: 36px;
-    height: 36px;
-  }
-  .lightbox-image {
-    max-height: 70vh;
-  }
-}
 
 /* ==========================================================================
    TOAST NOTIFICATION (INVISIBLE PAR DÉFAUT)
@@ -2574,8 +2637,17 @@ textarea.form-control {
 }
 
 @media (max-width: 768px) {
+  .site-header {
+    padding: 0 14px;
+    top: 12px;
+  }
+
+  .navbar {
+    padding: 8px 16px;
+  }
+
   .nav-brand .brand-logo-img {
-    height: 28px;
+    height: 27px;
   }
 
   .nav-links, .nav-actions .btn-glass {
@@ -2583,23 +2655,118 @@ textarea.form-control {
   }
   
   .menu-toggle {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  
+
+  /* --- Section Hero Mobile --- */
   .hero-section {
-    padding-top: 120px;
+    padding-top: 105px;
+    padding-bottom: 50px;
   }
-  
+
+  .hero-title {
+    font-size: clamp(1.85rem, 7.2vw, 2.85rem);
+    line-height: 1.14;
+    margin-bottom: 18px;
+    word-break: break-word;
+  }
+
+  .hero-title span.script-overlay {
+    display: block;
+    margin-left: 0;
+    margin-top: 4px;
+    font-size: 0.9em;
+  }
+
+  .hero-description {
+    font-size: 14.5px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    padding: 0 6px;
+  }
+
   .hero-cta-group {
     flex-direction: column;
     width: 100%;
+    gap: 12px;
+    margin-bottom: 24px;
   }
   
   .hero-cta-group .btn {
     width: 100%;
+    padding: 14px 24px;
   }
 
+  .hero-trust {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 12px;
+    font-size: 11px;
+    text-align: center;
+    max-width: 100%;
+    margin-bottom: 34px;
+  }
+
+  .hero-trust .dot {
+    opacity: 0.5;
+  }
+
+  .section-badge {
+    white-space: normal;
+    text-align: center;
+    font-size: 10px;
+    padding: 6px 14px;
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .hero-media-wrapper {
+    border-radius: var(--radius-md);
+  }
+
+  .hero-media-badge {
+    font-size: 10px;
+    padding: 6px 12px;
+    max-width: calc(100% - 24px);
+    left: 12px;
+    bottom: 12px;
+    white-space: normal;
+  }
+
+  /* --- Rythme & Espacement des Sections Mobile --- */
+  .services-section,
+  .showcase-section,
+  .focus-section,
+  .portfolio-section,
+  .process-section,
+  .testimonials-section,
+  .pricing-section,
+  .faq-section,
+  .contact-section {
+    padding: 55px 0;
+  }
+
+  .section-header {
+    margin-bottom: 36px;
+  }
+
+  .section-header h2 {
+    font-size: clamp(1.75rem, 6.2vw, 2.25rem);
+    margin-bottom: 12px;
+  }
+
+  .section-header p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* --- Grilles & Cartes en Colonne Unique --- */
   .services-grid-top,
+  .services-grid-bottom,
   .showcase-grid,
   .portfolio-grid,
   .process-grid,
@@ -2608,16 +2775,222 @@ textarea.form-control {
     grid-template-columns: 1fr;
     gap: 20px;
   }
+
+  .service-card,
+  .process-card,
+  .testimonial-card,
+  .pricing-card,
+  .booking-form-box {
+    padding: 24px 18px;
+  }
+
+  .service-card.card-featured .featured-pill {
+    top: 16px;
+    right: 16px;
+    font-size: 9.5px;
+    padding: 3px 10px;
+  }
+
+  .service-icon-box {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 16px;
+  }
+
+  /* --- Section Focus & Slider Avant/Après --- */
+  .focus-grid {
+    gap: 32px;
+  }
+
+  .focus-header h2 {
+    font-size: clamp(1.75rem, 6vw, 2.2rem);
+  }
+
+  .focus-header p {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .focus-tab-item {
+    padding: 16px 18px;
+  }
+
+  .tab-title {
+    font-size: 14.5px;
+  }
+
+  .tab-body {
+    font-size: 13px;
+    padding-left: 26px;
+  }
+
+  .before-label, .after-label {
+    bottom: 10px;
+    padding: 4px 10px;
+    font-size: 9.5px;
+  }
+
+  .before-label {
+    left: 10px;
+  }
+
+  .after-label {
+    right: 10px;
+  }
+
+  .before-after-handle {
+    width: 34px;
+    height: 34px;
+  }
+
+  .before-after-handle svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* --- Portfolio & Filtres Mobile --- */
+  .portfolio-filters {
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .filter-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  .portfolio-card-info {
+    padding: 18px 16px;
+  }
+
+  .portfolio-card-bottom h3 {
+    font-size: 15px;
+  }
+
+  .portfolio-actions {
+    margin-top: 30px;
+  }
+
+  .portfolio-actions .btn {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  /* --- Process & Témoignages --- */
+  .process-step-num {
+    font-size: 22px;
+    margin-bottom: 14px;
+  }
+
+  .process-card h3 {
+    font-size: 17px;
+  }
+
+  .testimonial-quote {
+    font-size: 13.5px;
+  }
+
+  /* --- Pricing --- */
+  .pricing-card {
+    padding: 28px 20px;
+  }
+
+  .pricing-title {
+    font-size: 20px;
+  }
+
+  .pricing-features li {
+    font-size: 13px;
+  }
+
+  /* --- FAQ --- */
+  .faq-question {
+    padding: 18px 20px;
+    font-size: 14.5px;
+    gap: 12px;
+  }
+
+  .faq-answer {
+    padding: 0 20px;
+    font-size: 13.5px;
+  }
+
+  .faq-item.active .faq-answer {
+    padding: 0 20px 20px 20px;
+  }
   
+  /* --- Contact & Formulaire (Correction iOS Zoom) --- */
   .contact-grid {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 36px;
   }
   
+  .contact-info h2 {
+    font-size: clamp(1.75rem, 6vw, 2.2rem);
+    margin-bottom: 14px;
+  }
+
+  .contact-info p {
+    font-size: 14.5px;
+    margin-bottom: 24px;
+  }
+
+  .contact-details-list {
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .detail-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .detail-text h4 {
+    font-size: 13px;
+  }
+
+  .detail-text a, .detail-text span {
+    font-size: 14px;
+    word-break: break-word;
+  }
+
   .form-grid-2 {
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* CRITIQUE : Empêche Safari iOS de forcer un zoom avant lors du tapotement dans les champs */
+  .form-control {
+    font-size: 16px !important;
+  }
+
+  /* Calendrier Sur-Mesure sur Écran Mobile */
+  .custom-calendar-dropdown {
+    width: 100%;
+    left: 0;
+    padding: 14px 10px;
+    box-sizing: border-box;
+  }
+
+  .calendar-nav-header {
+    margin-bottom: 12px;
+  }
+
+  .calendar-current-month {
+    font-size: 13.5px;
+  }
+
+  .calendar-weekdays {
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+
+  .cal-day-cell {
+    font-size: 12.5px;
+    min-height: 34px;
   }
   
+  /* --- Piliers du Studio --- */
   .pillars-grid {
     grid-template-columns: 1fr;
   }
@@ -2625,15 +2998,18 @@ textarea.form-control {
   .pillar-item {
     border-right: none;
     border-bottom: 1px solid var(--border-subtle);
-    padding-bottom: 24px;
+    padding-bottom: 22px;
+    padding-top: 18px;
   }
   
   .pillar-item:last-child {
     border-bottom: none;
   }
   
+  /* --- Footer Mobile --- */
   .footer-top {
     grid-template-columns: 1fr;
+    gap: 32px;
   }
   
   .footer-bottom {
@@ -2676,13 +3052,92 @@ textarea.form-control {
     width: 42px;
     height: 42px;
   }
-
-  .custom-calendar-dropdown {
-    width: 100%;
-    left: 0;
-  }
   
   .cursor-glow {
     display: none;
+  }
+
+  /* --- Lightbox Mobile Accessible & Contrôles Protégés --- */
+  .lightbox-modal {
+    padding: 14px 10px;
+  }
+
+  .lightbox-close {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    z-index: 2050;
+    background: rgba(18, 18, 18, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .lightbox-image {
+    max-height: 68vh;
+  }
+
+  .lightbox-nav-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .lightbox-prev {
+    left: 8px;
+  }
+
+  .lightbox-next {
+    right: 8px;
+  }
+
+  .lightbox-caption {
+    font-size: 13px;
+    margin-top: 12px;
+  }
+
+  .lightbox-caption strong {
+    font-size: 15px;
+  }
+
+  /* --- Toast Mobile Centré et Fluide --- */
+  .toast-notice {
+    left: 16px;
+    right: 16px;
+    bottom: 20px;
+    width: auto;
+    max-width: calc(100% - 32px);
+    justify-content: center;
+    text-align: center;
+    padding: 14px 18px;
+    font-size: 13px;
+  }
+}
+
+/* ==========================================================================
+   OPTIMISATIONS POUR PETITS SMARTPHONES (<= 480px)
+   ========================================================================== */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  .hero-title {
+    font-size: 1.85rem;
+  }
+
+  .service-card,
+  .process-card,
+  .testimonial-card,
+  .pricing-card,
+  .booking-form-box {
+    padding: 20px 14px;
+  }
+
+  .cal-day-cell {
+    font-size: 12px;
+  }
+
+  .custom-calendar-dropdown {
+    padding: 12px 8px;
   }
 }
